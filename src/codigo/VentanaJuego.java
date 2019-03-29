@@ -14,9 +14,9 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.Timer;
 
 /**
@@ -44,7 +44,7 @@ public class VentanaJuego extends javax.swing.JFrame {
     //imagen para cargar el spritesheet con todos los sprites del juego
     BufferedImage plantilla = null;
     Image [][] imagenes ;
-    
+    Image fondo;
     Timer temporizador = new Timer(10, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -57,6 +57,11 @@ public class VentanaJuego extends javax.swing.JFrame {
      */
     public VentanaJuego() {
         initComponents();
+        try {
+            fondo = ImageIO.read(getClass().getResource("/imagenes/fondo.jpg"));
+        }catch (IOException ex){
+            
+        }
         //para cargar el archivo de imagenes: 
         // 1º, el nombre del archivo
         // 2º filas que tiene el spritesheet
@@ -74,7 +79,7 @@ public class VentanaJuego extends javax.swing.JFrame {
         temporizador.start();
 
         //inicializo la posición inicial de la nave
-        miNave.imagen = imagenes[4][2];
+        miNave.imagen = imagenes[1][1];
         miNave.x = ANCHOPANTALLA / 2 - miNave.imagen.getWidth(this) / 2;
         miNave.y = ALTOPANTALLA - miNave.imagen.getHeight(this) - 40;
         
@@ -147,7 +152,7 @@ public class VentanaJuego extends javax.swing.JFrame {
         Graphics2D g2 = (Graphics2D) buffer.getGraphics();
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, ANCHOPANTALLA, ALTOPANTALLA);
-
+        g2.drawImage(fondo, 0, 0,null);
         ///////////////////////////////////////////////////////
         //redibujaremos aquí cada elemento
         g2.drawImage(miDisparo.imagen, miDisparo.x, miDisparo.y, null);
@@ -200,7 +205,16 @@ public class VentanaJuego extends javax.swing.JFrame {
             }
         }
     }
-    
+    private void reproduce (String cancion){
+        try{
+            Clip sonido = AudioSystem.getClip();
+            sonido.open(AudioSystem.getAudioInputStream(getClass().getResource(cancion)));
+            sonido.loop(0);
+            
+        }catch (Exception e ){
+            
+        }
+    }
     private void pintaMarcianos(Graphics2D _g2) {
 
         int anchoMarciano = listaMarcianos[0][0].imagen1.getWidth(null);
@@ -293,7 +307,9 @@ public class VentanaJuego extends javax.swing.JFrame {
             case KeyEvent.VK_SPACE:
                 miDisparo.posicionaDisparo(miNave);
                 miDisparo.disparado = true;
+                reproduce("/Sonidos/disparo.wav");
                 break;
+             
         }
     }//GEN-LAST:event_formKeyPressed
 
